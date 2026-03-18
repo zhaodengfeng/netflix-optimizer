@@ -1,98 +1,164 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <title>Netflix Optimizer - Options</title>
-        <link rel="stylesheet" href="picnic.min.css">
-        <style>
-            html {
-                height: auto;
-            }
-            body {
-                margin: 20px;
-                overflow: hidden;
-                font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-                background: #141414;
-                color: #fff;
-            }
-            h2 {
-                color: #e50914;
-                margin-bottom: 16px;
-                font-size: 18px;
-            }
-            .checkable {
-                color: #ccc;
-            }
-            label:hover .checkable {
-                color: #fff;
-            }
-            #save {
-                background: #e50914;
-                border: none;
-                color: #fff;
-                padding: 8px 20px;
-                border-radius: 4px;
-                cursor: pointer;
-                font-size: 14px;
-                margin-top: 8px;
-            }
-            #save:hover {
-                background: #f40612;
-            }
-            #options-saved {
-                color: #46d369;
-                margin-left: 10px;
-                font-size: 14px;
-            }
-            .full {
-                margin-bottom: 10px;
-            }
-        </style>
-    </head>
-    <body>
-        <h2>Netflix Optimizer Settings</h2>
-        <div class="flex">
-            <div class="full">
-                <label>
-                    <input type="checkbox" id="use-51" />
-                    <span class="checkable">Use 5.1 audio when available</span>
-                </label>
-            </div>
-            <div class="full">
-                <label>
-                    <input type="checkbox" id="set-max-bitrate" />
-                    <span class="checkable">Automatically select best bitrate available</span>
-                </label>
-            </div>
-            <div class="full">
-                <label>
-                    <input type="checkbox" id="disable-vp9" />
-                    <span class="checkable">Disable VP9 codec</span>
-                </label>
-            </div>
-            <div class="full">
-                <label>
-                    <input type="checkbox" id="disable-avchigh" />
-                    <span class="checkable">Disable AVChigh codec</span>
-                </label>
-            </div>
-            <div class="full">
-                <label>
-                    <input type="checkbox" id="disable-av1" />
-                    <span class="checkable">Disable AV1 codec</span>
-                </label>
-            </div>
-            <div class="full">
-                <label>
-                    <input type="checkbox" id="show-all-subs" />
-                    <span class="checkable">Show all subtitle tracks</span>
-                </label>
-            </div>
-            <div class="full">
-                <button id="save">Save</button>
-                <span id="options-saved" style="display: none">✓ Options saved!</span>
-            </div>
-        </div>
+<head>
+  <meta charset="UTF-8">
+  <title>Netflix Optimizer - Options</title>
+  <style>
+    * { box-sizing: border-box; }
+    html, body { height: auto; }
+    body {
+      margin: 20px;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #141414;
+      color: #fff;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+    h2 {
+      color: #e50914;
+      margin: 0 0 16px 0;
+      font-size: 18px;
+    }
+    .section-title {
+      color: #aaa;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin: 16px 0 8px 0;
+    }
+    .option-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 6px 0;
+      cursor: pointer;
+    }
+    .option-row:hover .option-label {
+      color: #fff;
+    }
+    /* Custom checkbox */
+    input[type="checkbox"] {
+      opacity: 0;
+      width: 0;
+      height: 0;
+      position: absolute;
+      display: inline-block;
+    }
+    .checkbox-custom {
+      display: inline-block;
+      width: 18px;
+      height: 18px;
+      border: 2px solid #555;
+      border-radius: 3px;
+      flex-shrink: 0;
+      transition: all 0.2s;
+      position: relative;
+      background: transparent;
+    }
+    input[type="checkbox"]:checked + .checkbox-custom {
+      background: #e50914;
+      border-color: #e50914;
+    }
+    input[type="checkbox"]:checked + .checkbox-custom::after {
+      content: '';
+      position: absolute;
+      left: 4px;
+      top: 1px;
+      width: 5px;
+      height: 9px;
+      border: solid #fff;
+      border-width: 0 2px 2px 0;
+      transform: rotate(45deg);
+    }
+    input[type="checkbox"]:focus + .checkbox-custom {
+      border-color: #e50914;
+    }
+    .checkbox-custom::before {
+      content: '';
+      position: absolute;
+      left: 0; right: 0; top: 0; bottom: 0;
+      border-radius: 3px;
+    }
+    .option-label {
+      color: #ccc;
+      transition: color 0.2s;
+      user-select: none;
+    }
+    #save {
+      background: #e50914;
+      border: none;
+      color: #fff;
+      padding: 8px 20px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+      margin-top: 16px;
+    }
+    #save:hover { background: #f40612; }
+    #options-saved {
+      color: #46d369;
+      margin-left: 10px;
+      font-size: 14px;
+    }
+    .divider {
+      height: 1px;
+      background: #333;
+      margin: 12px 0;
+    }
+  </style>
+</head>
+<body>
+  <h2>Netflix Optimizer Settings</h2>
 
-        <script src="options.js"></script>
-    </body>
+  <div class="section-title">Audio &amp; Video</div>
+
+  <label class="option-row">
+    <input type="checkbox" id="use-51" checked>
+    <span class="checkbox-custom"></span>
+    <span class="option-label">Use 5.1 audio when available</span>
+  </label>
+
+  <label class="option-row">
+    <input type="checkbox" id="set-max-bitrate" checked>
+    <span class="checkbox-custom"></span>
+    <span class="option-label">Automatically select best bitrate available</span>
+  </label>
+
+  <div class="divider"></div>
+  <div class="section-title">Codecs</div>
+
+  <label class="option-row">
+    <input type="checkbox" id="disable-vp9">
+    <span class="checkbox-custom"></span>
+    <span class="option-label">Disable VP9 codec</span>
+  </label>
+
+  <label class="option-row">
+    <input type="checkbox" id="disable-avchigh">
+    <span class="checkbox-custom"></span>
+    <span class="option-label">Disable AVChigh codec</span>
+  </label>
+
+  <label class="option-row">
+    <input type="checkbox" id="disable-av1">
+    <span class="checkbox-custom"></span>
+    <span class="option-label">Disable AV1 codec</span>
+  </label>
+
+  <div class="divider"></div>
+  <div class="section-title">Subtitles</div>
+
+  <label class="option-row">
+    <input type="checkbox" id="show-all-subs">
+    <span class="checkbox-custom"></span>
+    <span class="option-label">Show all subtitle tracks</span>
+  </label>
+
+  <div>
+    <button id="save">Save</button>
+    <span id="options-saved" style="display:none">✓ Saved!</span>
+  </div>
+
+  <script src="options.js"></script>
+</body>
 </html>

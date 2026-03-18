@@ -10,9 +10,9 @@
   <div class="container">
     <div class="header">
       <h1>Netflix Optimizer</h1>
-      <span class="version" id="version">v5.0.0</span>
+      <span class="version" id="version">v26.3.18</span>
     </div>
-    
+
     <div class="status-card" id="statusCard">
       <div class="status-icon" id="statusIcon">⏳</div>
       <div class="status-info">
@@ -20,7 +20,7 @@
         <div class="status-desc" id="statusDesc">Checking platform</div>
       </div>
     </div>
-    
+
     <div class="info-section">
       <div class="info-row">
         <span class="info-label">Platform</span>
@@ -34,29 +34,69 @@
         <span class="info-label">Audio</span>
         <span class="info-value" id="audio">-</span>
       </div>
-      <div class="info-row">
-        <span class="info-label">4K Support</span>
-        <span class="info-value" id="can4K">-</span>
+    </div>
+
+    <div class="settings-section">
+      <div class="settings-title">Settings</div>
+
+      <label class="setting-row">
+        <input type="checkbox" id="use-51-popup">
+        <span class="checkbox-custom"></span>
+        <span class="setting-label">5.1 Audio</span>
+      </label>
+
+      <label class="setting-row">
+        <input type="checkbox" id="set-max-bitrate-popup">
+        <span class="checkbox-custom"></span>
+        <span class="setting-label">Auto Best Bitrate</span>
+      </label>
+
+      <label class="setting-row">
+        <input type="checkbox" id="disable-vp9-popup">
+        <span class="checkbox-custom"></span>
+        <span class="setting-label">Disable VP9</span>
+      </label>
+
+      <label class="setting-row">
+        <input type="checkbox" id="disable-avchigh-popup">
+        <span class="checkbox-custom"></span>
+        <span class="setting-label">Disable AVChigh</span>
+      </label>
+
+      <label class="setting-row">
+        <input type="checkbox" id="disable-av1-popup">
+        <span class="checkbox-custom"></span>
+        <span class="setting-label">Disable AV1</span>
+      </label>
+
+      <label class="setting-row">
+        <input type="checkbox" id="show-all-subs-popup">
+        <span class="checkbox-custom"></span>
+        <span class="setting-label">All Subtitles</span>
+      </label>
+
+      <div class="setting-footer">
+        <span id="save-msg" class="save-msg">✓ Saved</span>
+        <button id="save-btn">Save</button>
       </div>
     </div>
-    
+
     <div class="shortcuts">
-      <h3>Keyboard Shortcuts</h3>
       <div class="shortcut">
         <kbd>Ctrl+Shift+Alt+D</kbd>
-        <span>Debug Info</span>
+        <span>Debug</span>
       </div>
       <div class="shortcut">
         <kbd>Ctrl+Shift+Alt+B</kbd>
-        <span>Bitrate Menu</span>
+        <span>Bitrate</span>
       </div>
     </div>
-    
+
     <div class="footer">
-      Netflix Optimizer v5.0.0
+      More options: Extension Details → Options
     </div>
   </div>
-  
+
   <script src="popup.js"></script>
 </body>
 </html>
