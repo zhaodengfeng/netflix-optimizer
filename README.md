@@ -51,17 +51,3 @@ Right-click the extension icon → **Options** to configure:
 1. **Player core redirect** — uses `declarativeNetRequest` to redirect Netflix's `cadmium-playercore` script to a patched version that unlocks higher quality profiles
 2. **Bitrate forcing** — injects a script that simulates the hidden `Ctrl+Alt+Shift+B` menu interaction to select the maximum bitrate automatically
 3. **Platform detection** — detects browser/OS combination to report actual achievable quality
-
-## Improvements over New Netflix 1080p (1.33.0_0)
-
-- ✅ Multi-language support (XPath labels in 8 languages)
-- ✅ Modern keyboard event API (`code`/`key` + `keyCode` fallback)
-- ✅ `MutationObserver` instead of polling interval (better performance)
-- ✅ Race condition protection (`isProcessing` lock)
-- ✅ React-compatible `change` event dispatch
-- ✅ Null-safe cleanup (no crash if style node missing)
-- ✅ 4K detection and platform-aware status popup
-
-## Credits
-
-Based on the original work by [truedread](https://github.com/truedread/netflix-1080p) and [jangxx](https://github.com/jangxx/netflix-1080p).
