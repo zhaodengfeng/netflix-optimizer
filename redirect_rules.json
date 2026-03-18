@@ -1,0 +1,35 @@
+[
+    {
+        "id": 1,
+        "priority": 1,
+        "action": {
+            "type": "redirect",
+            "redirect": { "extensionPath": "/cadmium-playercore-6.0052.717.911-patched.js" }
+        },
+        "condition": {
+            "urlFilter": "*://assets.nflxext.com/player/html/ffe/*"
+        }
+    },
+    {
+        "id": 2,
+        "priority": 1,
+        "action": {
+            "type": "redirect",
+            "redirect": { "extensionPath": "/cadmium-playercore-6.0052.717.911-patched.js" }
+        },
+        "condition": {
+            "urlFilter": "*://*.a.nflxso.net/sec/player/html/ffe/*"
+        }
+    },
+    {
+        "id": 3,
+        "priority": 1,
+        "action": {
+            "type": "redirect",
+            "redirect": { "extensionPath": "/cadmium-playercore-6.0052.717.911-patched.js" }
+        },
+        "condition": {
+            "urlFilter": "*://assets.nflxext.com/*/ffe/player/html/*"
+        }
+    }
+]

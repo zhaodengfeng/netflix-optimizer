@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Netflix Optimizer</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>Netflix Optimizer</h1>
+      <span class="version" id="version">v5.0.0</span>
+    </div>
+    
+    <div class="status-card" id="statusCard">
+      <div class="status-icon" id="statusIcon">⏳</div>
+      <div class="status-info">
+        <div class="status-title" id="statusTitle">Detecting...</div>
+        <div class="status-desc" id="statusDesc">Checking platform</div>
+      </div>
+    </div>
+    
+    <div class="info-section">
+      <div class="info-row">
+        <span class="info-label">Platform</span>
+        <span class="info-value" id="platform">-</span>
+      </div>
+      <div class="info-row">
+        <span class="info-label">Max Resolution</span>
+        <span class="info-value" id="maxRes">-</span>
+      </div>
+      <div class="info-row">
+        <span class="info-label">Audio</span>
+        <span class="info-value" id="audio">-</span>
+      </div>
+      <div class="info-row">
+        <span class="info-label">4K Support</span>
+        <span class="info-value" id="can4K">-</span>
+      </div>
+    </div>
+    
+    <div class="shortcuts">
+      <h3>Keyboard Shortcuts</h3>
+      <div class="shortcut">
+        <kbd>Ctrl+Shift+Alt+D</kbd>
+        <span>Debug Info</span>
+      </div>
+      <div class="shortcut">
+        <kbd>Ctrl+Shift+Alt+B</kbd>
+        <span>Bitrate Menu</span>
+      </div>
+    </div>
+    
+    <div class="footer">
+      Netflix Optimizer v5.0.0
+    </div>
+  </div>
+  
+  <script src="popup.js"></script>
+</body>
+</html>

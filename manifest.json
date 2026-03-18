@@ -1,0 +1,73 @@
+{
+  "manifest_version": 3,
+  "name": "Netflix Optimizer - 4K/1080p + 5.1",
+  "version": "26.3.18",
+  "description": "Unlock 4K HDR on Windows Edge, 1080p on Mac/Chrome, plus 5.1 audio",
+  "permissions": [
+    "declarativeNetRequest",
+    "storage"
+  ],
+  "host_permissions": [
+    "https://*.netflix.com/*",
+    "https://assets.nflxext.com/*",
+    "https://*.a.nflxso.net/*"
+  ],
+  "background": {
+    "service_worker": "background.js",
+    "type": "module"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "*://assets.nflxext.com/player/html/ffe/*",
+        "*://*.a.nflxso.net/sec/player/html/ffe/*",
+        "*://netflix.com/*",
+        "*://www.netflix.com/*",
+        "*://assets.nflxext.com/*/ffe/player/html/*"
+      ],
+      "js": ["content_loader.js"],
+      "css": ["style_fix.css"],
+      "run_at": "document_start",
+      "all_frames": true
+    }
+  ],
+  "declarative_net_request": {
+    "rule_resources": [
+      {
+        "id": "redirect_rules",
+        "enabled": true,
+        "path": "redirect_rules.json"
+      }
+    ]
+  },
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "netflix_maxrate.js",
+        "cadmium-playercore-6.0052.717.911-patched.js"
+      ],
+      "matches": [
+        "*://www.netflix.com/*",
+        "*://assets.nflxext.com/*",
+        "*://*.nflxso.net/*"
+      ]
+    }
+  ],
+  "options_ui": {
+    "page": "pages/options.html",
+    "open_in_tab": false
+  },
+  "action": {
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "img/icon16.png",
+      "48": "img/icon48.png"
+    }
+  },
+  "icons": {
+    "16": "img/icon16.png",
+    "32": "img/icon32.png",
+    "48": "img/icon48.png",
+    "128": "img/icon128.png"
+  }
+}
