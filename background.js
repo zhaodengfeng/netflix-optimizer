@@ -1,5 +1,5 @@
 // background.js - Netflix Optimizer Service Worker
-const EXTENSION_VERSION = '26.3.19';
+const EXTENSION_VERSION = '26.6.20';
 
 function detectPlatform() {
   const ua = navigator.userAgent;
