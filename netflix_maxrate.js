@@ -106,6 +106,62 @@ function triggerBitrateMenu() {
 }
 
 /**
+ * Parse bitrate from a Netflix bitrate menu option.
+ * Netflix uses the bitrate as the option value, but keep text/title fallbacks
+ * for player UI changes and localized menu variants.
+ * @param {HTMLOptionElement} option - Bitrate option element
+ * @returns {number} Parsed bitrate, or NaN when unavailable
+ */
+function parseBitrateOption(option) {
+    const candidates = [
+        option.value,
+        option.getAttribute('value'),
+        option.textContent,
+        option.getAttribute('title')
+    ];
+
+    for (const candidate of candidates) {
+        if (!candidate) continue;
+
+        const match = String(candidate).replace(/,/g, '').match(/\d+(?:\.\d+)?/);
+        if (!match) continue;
+
+        const bitrate = Number(match[0]);
+        if (Number.isFinite(bitrate)) {
+            return bitrate;
+        }
+    }
+
+    return NaN;
+}
+
+/**
+ * Select the option with the highest numeric bitrate.
+ * @param {NodeListOf<HTMLOptionElement>} options - Available bitrate options
+ * @returns {HTMLOptionElement|null} Highest-bitrate option, or null
+ */
+function findHighestBitrateOption(options) {
+    let highestOption = null;
+    let highestBitrate = -Infinity;
+    let highestIndex = -1;
+
+    options.forEach((option, index) => {
+        const bitrate = parseBitrateOption(option);
+        if (!Number.isFinite(bitrate)) {
+            return;
+        }
+
+        if (bitrate > highestBitrate || (bitrate === highestBitrate && index > highestIndex)) {
+            highestOption = option;
+            highestBitrate = bitrate;
+            highestIndex = index;
+        }
+    });
+
+    return highestOption || options[options.length - 1] || null;
+}
+
+/**
  * Set bitrate to maximum value
  * @returns {boolean} Success status
  */
@@ -134,17 +190,24 @@ function maxbitrate_set() {
         if (options.length === 0) return;
 
         // Deselect all options
-        options.forEach(opt => opt.removeAttribute('selected'));
+        options.forEach(opt => {
+            opt.selected = false;
+            opt.removeAttribute('selected');
+        });
 
-        // Select the last (highest) option
-        const highestOption = options[options.length - 1];
+        // Select the actual highest bitrate. Netflix option order can vary by codec/profile.
+        const highestOption = findHighestBitrateOption(options);
+        if (!highestOption) return;
+
+        highestOption.selected = true;
         highestOption.setAttribute('selected', 'selected');
         
         // Also set the select element's value
         const selectElement = parent.querySelector('select');
         if (selectElement) {
             selectElement.value = highestOption.value;
-            // Trigger change event for React compatibility
+            // Trigger input/change events for React compatibility
+            selectElement.dispatchEvent(new Event('input', { bubbles: true }));
             selectElement.dispatchEvent(new Event('change', { bubbles: true }));
         }
 

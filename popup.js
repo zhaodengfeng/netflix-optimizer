@@ -67,7 +67,7 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 function updateUI(info) {
-  document.getElementById('version').textContent = 'v' + (info.version || '26.3.18');
+  document.getElementById('version').textContent = 'v' + (info.version || '26.3.19');
 
   const statusIcon = document.getElementById('statusIcon');
   const statusTitle = document.getElementById('statusTitle');
