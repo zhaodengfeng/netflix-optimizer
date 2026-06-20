@@ -16,7 +16,7 @@ A Chrome/Edge extension to unlock the best possible Netflix playback quality on 
 1. Download the latest zip from [Releases](../../releases)
 2. Unzip to a folder
 3. Open Chrome → `chrome://extensions` → Enable **Developer mode**
-4. Click **Load unpacked** → select the unzipped folder
+4. Click **Load unpacked** → select the `src` folder
 
 ## Platform Support
 
@@ -45,6 +45,10 @@ Right-click the extension icon → **Options** to configure:
 |----------|--------|
 | `Ctrl+Shift+Alt+D` | Debug Info |
 | `Ctrl+Shift+Alt+B` | Bitrate Override Menu |
+
+## Packaging
+
+Run `./scripts/package.sh` to create a clean release zip from the `src` folder.
 
 ## How It Works
 

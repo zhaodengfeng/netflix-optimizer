@@ -1,10 +1,28 @@
-if (window.globalOptions === undefined) {
-    try {
-        window.globalOptions = JSON.parse(document.getElementById("netflix-1080p-settings").innerText);
-    } catch(e) {
-        console.error("Could not load settings:", e);
+(function () {
+    var defaultOptions = {
+        use6Channels: true,
+        setMaxBitrate: true,
+        disableVP9: false,
+        disableAVChigh: false,
+        disableAV1: false,
+        showAllSubs: false
+    };
+    var loadedOptions = {};
+
+    if (window.globalOptions !== undefined && window.globalOptions) {
+        loadedOptions = window.globalOptions;
+    } else {
+        try {
+            var settingsEl = document.getElementById("netflix-optimizer-settings") ||
+                document.getElementById("netflix-1080p-settings");
+            if (settingsEl && settingsEl.textContent) {
+                loadedOptions = JSON.parse(settingsEl.textContent);
+            }
+        } catch (e) {}
     }
-}
+
+    window.globalOptions = Object.assign({}, defaultOptions, loadedOptions || {});
+}());
 
 M5Jte[80078] = (function () {
 	var k6w = 2;
@@ -23018,10 +23036,7 @@ M5Jte[103077] = "cM6";
 								G = K.qma().concat(L.qma()).concat(y.config().tA).concat(["iso_23001_18-dash-live"]).concat(["BIF240", "BIF320"]).filter(Boolean);
 								da = "postplay" === z.Xe ? !0 : !!A.isUIAutoPlay;
 
-								console.log("Netflix profiles:", G);
-
-                                // MARKER_PROFILES
-                                let profiles = [
+	                                let profiles = [
                                     "playready-h264mpl30-dash",
                                     "playready-h264mpl31-dash",
                                     "playready-h264mpl40-dash",
@@ -23037,32 +23052,26 @@ M5Jte[103077] = "cM6";
 
 								let showAllSubDubTracks = false;
 
-                                if (!window.globalOptions.disableVP9) {
-                                    profiles.push(
-                                        "vp9-profile0-L21-dash-cenc",
-                                        "vp9-profile0-L30-dash-cenc",
-                                        "vp9-profile0-L31-dash-cenc",
-                                        "vp9-profile0-L40-dash-cenc",
-                                    );
-                                } else {
-                                    console.log("VP9 disabled");
-                                }
+	                                if (!window.globalOptions.disableVP9) {
+	                                    profiles.push(
+	                                        "vp9-profile0-L21-dash-cenc",
+	                                        "vp9-profile0-L30-dash-cenc",
+	                                        "vp9-profile0-L31-dash-cenc",
+	                                        "vp9-profile0-L40-dash-cenc",
+	                                    );
+	                                }
 
-                                if (window.globalOptions.use6Channels) {
-                                    profiles.push("heaac-5.1-dash");
-                                    console.log("5.1 support enabled");
-                                }
+	                                if (window.globalOptions.use6Channels) {
+	                                    profiles.push("heaac-5.1-dash");
+	                                }
 
-                                if (!window.globalOptions.disableAVChigh) {
-                                    profiles.push("playready-h264hpl30-dash", "playready-h264hpl31-dash", "playready-h264hpl40-dash");
-                                    profiles.push("h264hpl30-dash-playready-live", "h264hpl31-dash-playready-live", "h264hpl40-dash-playready-live");
-									profiles.push("h264mpl30-dash-playready-prk-qc", "h264mpl31-dash-playready-prk-qc", "h264mpl40-dash-playready-prk-qc");
-	
-                                } else {
-                                    console.log("AVChigh disabled");
-                                }
+	                                if (!window.globalOptions.disableAVChigh) {
+	                                    profiles.push("playready-h264hpl30-dash", "playready-h264hpl31-dash", "playready-h264hpl40-dash");
+	                                    profiles.push("h264hpl30-dash-playready-live", "h264hpl31-dash-playready-live", "h264hpl40-dash-playready-live");
+										profiles.push("h264mpl30-dash-playready-prk-qc", "h264mpl31-dash-playready-prk-qc", "h264mpl40-dash-playready-prk-qc");
+	                                }
 
-								if (!window.globalOptions.disableAV1) {
+									if (!window.globalOptions.disableAV1) {
 									profiles.push(
 										"av1-main-L20-dash-cbcs-prk",
 										"av1-main-L21-dash-cbcs-prk",
@@ -23071,22 +23080,15 @@ M5Jte[103077] = "cM6";
 										"av1-main-L40-dash-cbcs-prk",
 										"av1-main-L41-dash-cbcs-prk",
 										"av1-main-L50-dash-cbcs-prk",
-										"av1-main-L51-dash-cbcs-prk"
-									);
-								} else {
-									console.log("AV1 disabled");
-								}
+											"av1-main-L51-dash-cbcs-prk"
+										);
+									}
 
-                                if (window.globalOptions.showAllSubs) {
-                                    showAllSubDubTracks = true;
-                                    console.log("All subtitle tracks shown");
-                                }
+	                                if (window.globalOptions.showAllSubs) {
+	                                    showAllSubDubTracks = true;
+	                                }
 
-                                console.log("drmType:", O);
-
-								console.log("Final profiles:", profiles);
-
-								I = {
+									I = {
 									type: "standard",
 									manifestVersion: y.zi.Lnb ? "v3" : y.zi.Knb ? "v2" : "v1",
 									viewableId: C,
@@ -148934,5 +148936,3 @@ M5Jte[103077] = "cM6";
 		}).call(Ba);
 	})(window);
 }).call(window);
-
-console.log("Loaded the patched cadmium player");

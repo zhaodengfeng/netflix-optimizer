@@ -11,6 +11,25 @@ const CONFIG = {
     RETRY_DELAY: 100,
     HIDE_ATTEMPTS: 10
 };
+const DEBUG = false;
+
+function debugLog(...args) {
+    if (DEBUG) {
+        console.log(...args);
+    }
+}
+
+function debugWarn(...args) {
+    if (DEBUG) {
+        console.warn(...args);
+    }
+}
+
+function debugError(...args) {
+    if (DEBUG) {
+        console.error(...args);
+    }
+}
 
 /**
  * Multi-language labels for Netflix bitrate menu
@@ -246,7 +265,7 @@ function maxbitrate_hide(attempts = CONFIG.HIDE_ATTEMPTS) {
  */
 function maxbitrate_run(retryCount = 0) {
     if (retryCount >= CONFIG.MAX_RETRIES) {
-        console.warn('[Netflix Optimizer] Max bitrate set failed after max retries');
+        debugWarn('[Netflix Optimizer] Max bitrate set failed after max retries');
         maxbitrate_finish();
         return;
     }
@@ -304,10 +323,10 @@ function loadSettings() {
                            document.getElementById('netflix-1080p-settings');
         if (settingsEl && settingsEl.innerText) {
             window.globalOptions = JSON.parse(settingsEl.innerText);
-            console.log('[Netflix Optimizer] Settings loaded:', window.globalOptions);
+            debugLog('[Netflix Optimizer] Settings loaded:', window.globalOptions);
         }
     } catch (e) {
-        console.error('[Netflix Optimizer] Could not load settings:', e);
+        debugError('[Netflix Optimizer] Could not load settings:', e);
         window.globalOptions = null;
     }
 }
@@ -327,17 +346,23 @@ function isWatchPage(url) {
 
     // Safety check for settings
     if (!window.globalOptions) {
-        console.warn('[Netflix Optimizer] No settings available, waiting...');
+        debugWarn('[Netflix Optimizer] No settings available, waiting...');
         setTimeout(init, 500);
         return;
     }
 
     if (!window.globalOptions.setMaxBitrate) {
-        console.log('[Netflix Optimizer] Max bitrate forcing disabled in settings');
+        debugLog('[Netflix Optimizer] Max bitrate forcing disabled in settings');
         return;
     }
 
-    console.log('[Netflix Optimizer] Max bitrate forcing enabled');
+    debugLog('[Netflix Optimizer] Max bitrate forcing enabled');
+
+    if (!document.body) {
+        debugLog('[Netflix Optimizer] Waiting for document body...');
+        setTimeout(init, 100);
+        return;
+    }
 
     let currentUrl = window.location.toString();
     let isProcessing = false;
@@ -351,7 +376,7 @@ function isWatchPage(url) {
             
             if (isWatchPage(newUrl)) {
                 isProcessing = true;
-                console.log('[Netflix Optimizer] Watch page detected, starting optimization...');
+                debugLog('[Netflix Optimizer] Watch page detected, starting optimization...');
                 
                 // Delay to allow player to fully initialize
                 setTimeout(() => {
@@ -375,5 +400,5 @@ function isWatchPage(url) {
         }, 2000);
     }
 
-    console.log('[Netflix Optimizer] Initialized with MutationObserver');
+    debugLog('[Netflix Optimizer] Initialized with MutationObserver');
 })();

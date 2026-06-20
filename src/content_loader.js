@@ -5,6 +5,13 @@
 const INTERNAL_SCRIPTS = [
     'netflix_maxrate.js'
 ];
+const DEBUG = false;
+
+function debugLog(...args) {
+    if (DEBUG) {
+        console.log(...args);
+    }
+}
 
 // promisify chrome storage API for easier chaining
 function chromeStorageGet(opts) {
@@ -19,7 +26,7 @@ function addSettingsToHtml(settings) {
     mainScript.text = JSON.stringify(settings);
     mainScript.id = "netflix-optimizer-settings";
     document.documentElement.appendChild(mainScript);
-    console.log("[Netflix Optimizer] Settings loaded", settings);
+    debugLog("[Netflix Optimizer] Settings loaded", settings);
 }
 
 chromeStorageGet({
@@ -40,7 +47,7 @@ chromeStorageGet({
             mainScript.src = mainScriptUrl;
             mainScript.setAttribute('data-nfopt', INTERNAL_SCRIPTS[i]);
             document.documentElement.appendChild(mainScript);
-            console.log("[Netflix Optimizer] Injected:", INTERNAL_SCRIPTS[i]);
+            debugLog("[Netflix Optimizer] Injected:", INTERNAL_SCRIPTS[i]);
         } catch (e) {
             console.error("[Netflix Optimizer] Failed to inject:", INTERNAL_SCRIPTS[i], e);
         }

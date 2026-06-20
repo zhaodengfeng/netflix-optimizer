@@ -1,5 +1,12 @@
 // background.js - Netflix Optimizer Service Worker
 const EXTENSION_VERSION = '26.6.20';
+const DEBUG = false;
+
+function debugLog(...args) {
+  if (DEBUG) {
+    console.log(...args);
+  }
+}
 
 function detectPlatform() {
   const ua = navigator.userAgent;
@@ -74,4 +81,4 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   }
 });
 
-console.log('[Netflix Optimizer v' + EXTENSION_VERSION + '] Service worker initialized');
+debugLog('[Netflix Optimizer v' + EXTENSION_VERSION + '] Service worker initialized');
