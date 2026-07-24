@@ -146,6 +146,21 @@
   </label>
 
   <div class="divider"></div>
+  <div class="section-title">Experimental</div>
+
+  <label class="option-row">
+    <input type="checkbox" id="use-hevc">
+    <span class="checkbox-custom"></span>
+    <span class="option-label">HEVC / 4K HDR (Windows 11 + Edge)</span>
+  </label>
+
+  <label class="option-row">
+    <input type="checkbox" id="use-ddplus">
+    <span class="checkbox-custom"></span>
+    <span class="option-label">Dolby Digital Plus / Atmos (Windows 11 + Edge)</span>
+  </label>
+
+  <div class="divider"></div>
   <div class="section-title">Subtitles</div>
 
   <label class="option-row">
@@ -157,6 +172,9 @@
   <div>
     <button id="save">Save</button>
     <span id="options-saved" style="display:none">✓ Saved!</span>
+  </div>
+  <div style="color:#666;font-size:11px;margin-top:8px;">
+    "Automatically select best bitrate" applies instantly. Codec / 5.1 / subtitle changes apply after reloading the Netflix tab.
   </div>
 
   <script src="options.js"></script>

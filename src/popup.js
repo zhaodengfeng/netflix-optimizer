@@ -8,6 +8,8 @@ const checkboxes = {
   disableAVChigh: document.getElementById('disable-avchigh-popup'),
   disableAV1: document.getElementById('disable-av1-popup'),
   showAllSubs: document.getElementById('show-all-subs-popup'),
+  useHEVC: document.getElementById('use-hevc-popup'),
+  useDDPlus: document.getElementById('use-ddplus-popup'),
 };
 
 const saveBtn = document.getElementById('save-btn');
@@ -22,6 +24,8 @@ function restoreSettings() {
     disableAVChigh: false,
     disableAV1: false,
     showAllSubs: false,
+    useHEVC: false,
+    useDDPlus: false,
   }, function(items) {
     checkboxes.use51.checked = items.use6Channels;
     checkboxes.maxBitrate.checked = items.setMaxBitrate;
@@ -29,6 +33,8 @@ function restoreSettings() {
     checkboxes.disableAVChigh.checked = items.disableAVChigh;
     checkboxes.disableAV1.checked = items.disableAV1;
     checkboxes.showAllSubs.checked = items.showAllSubs;
+    checkboxes.useHEVC.checked = items.useHEVC;
+    checkboxes.useDDPlus.checked = items.useDDPlus;
   });
 }
 
@@ -41,6 +47,8 @@ function saveSettings() {
     disableAVChigh: checkboxes.disableAVChigh.checked,
     disableAV1: checkboxes.disableAV1.checked,
     showAllSubs: checkboxes.showAllSubs.checked,
+    useHEVC: checkboxes.useHEVC.checked,
+    useDDPlus: checkboxes.useDDPlus.checked,
   }, function() {
     saveMsg.classList.add('visible');
     setTimeout(() => saveMsg.classList.remove('visible'), 2000);
@@ -67,7 +75,7 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 function updateUI(info) {
-  document.getElementById('version').textContent = 'v' + (info.version || '26.6.20');
+  document.getElementById('version').textContent = 'v' + (info.version || '26.7.23');
 
   const statusIcon = document.getElementById('statusIcon');
   const statusTitle = document.getElementById('statusTitle');

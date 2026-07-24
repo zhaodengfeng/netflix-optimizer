@@ -6,10 +6,13 @@
  */
 const CONFIG = {
     WATCH_PATTERN: /netflix\.com\/(watch|browse|title|latest).*/,
-    POLL_INTERVAL: 1000,
     MAX_RETRIES: 20,
     RETRY_DELAY: 100,
-    HIDE_ATTEMPTS: 10
+    HIDE_ATTEMPTS: 10,
+    // How long to wait for the player to actually start playing before
+    // falling back to the old blind attempt (60 x 500ms = 30s max).
+    PLAYER_WAIT_ATTEMPTS: 60,
+    PLAYER_WAIT_INTERVAL: 500
 };
 const DEBUG = false;
 
@@ -311,6 +314,23 @@ function maxbitrate_finish() {
 }
 
 /**
+ * Read settings from the injected JSON element.
+ * @returns {object|null} Parsed settings, or null when unavailable
+ */
+function readSettingsFromDom() {
+    try {
+        const settingsEl = document.getElementById('netflix-optimizer-settings') ||
+                           document.getElementById('netflix-1080p-settings');
+        if (settingsEl && settingsEl.innerText) {
+            return JSON.parse(settingsEl.innerText);
+        }
+    } catch (e) {
+        debugError('[Netflix Optimizer] Could not parse settings:', e);
+    }
+    return null;
+}
+
+/**
  * Initialize settings from injected script
  */
 function loadSettings() {
@@ -318,17 +338,82 @@ function loadSettings() {
         return;
     }
 
-    try {
-        const settingsEl = document.getElementById('netflix-optimizer-settings') || 
-                           document.getElementById('netflix-1080p-settings');
-        if (settingsEl && settingsEl.innerText) {
-            window.globalOptions = JSON.parse(settingsEl.innerText);
-            debugLog('[Netflix Optimizer] Settings loaded:', window.globalOptions);
-        }
-    } catch (e) {
-        debugError('[Netflix Optimizer] Could not load settings:', e);
+    const settings = readSettingsFromDom();
+    if (settings) {
+        window.globalOptions = settings;
+        debugLog('[Netflix Optimizer] Settings loaded:', window.globalOptions);
+    } else {
         window.globalOptions = null;
     }
+}
+
+/**
+ * Re-read the settings element so values saved in popup/options apply
+ * without a page reload (content_loader updates the element and pings us).
+ * The DOM element always wins over window.globalOptions, which the patched
+ * playercore may have pre-filled with defaults.
+ */
+function refreshSettings() {
+    const settings = readSettingsFromDom();
+    if (settings) {
+        window.globalOptions = Object.assign({}, window.globalOptions || {}, settings);
+    }
+}
+
+/**
+ * Get the Netflix player instance via the internal app API.
+ * @returns {object|null} Player instance, or null when unavailable
+ */
+function getNetflixPlayer() {
+    try {
+        const playerApp = window.netflix &&
+                          window.netflix.appContext &&
+                          window.netflix.appContext.state &&
+                          window.netflix.appContext.state.playerApp;
+        const videoPlayer = playerApp && playerApp.getAPI && playerApp.getAPI().videoPlayer;
+        if (!videoPlayer) return null;
+
+        const sessionIds = videoPlayer.getAllPlayerSessionIds ? videoPlayer.getAllPlayerSessionIds() : [];
+        if (!sessionIds || !sessionIds.length) return null;
+
+        return videoPlayer.getVideoPlayerBySessionId(sessionIds[0]) || null;
+    } catch (e) {
+        return null;
+    }
+}
+
+/**
+ * Wait until playback has actually started before running the bitrate
+ * automation (inspired by lkmvip/netflix-4K-DDplus). If the player API is
+ * unavailable or playback never starts within the wait window, falls back
+ * to running anyway so a Netflix API change cannot kill the feature.
+ * @param {Function} onReady - Called once playback started (or on timeout)
+ * @param {number} attempts - Remaining poll attempts
+ */
+function waitForPlayback(onReady, attempts = CONFIG.PLAYER_WAIT_ATTEMPTS) {
+    const player = getNetflixPlayer();
+
+    let playing = false;
+    if (player && typeof player.isPlaying === 'function') {
+        try {
+            playing = !!player.isPlaying();
+        } catch (e) {
+            playing = false;
+        }
+    }
+
+    if (playing) {
+        onReady();
+        return;
+    }
+
+    if (attempts <= 0) {
+        debugWarn('[Netflix Optimizer] Timed out waiting for playback, trying anyway');
+        onReady();
+        return;
+    }
+
+    setTimeout(() => waitForPlayback(onReady, attempts - 1), CONFIG.PLAYER_WAIT_INTERVAL);
 }
 
 /**
@@ -351,38 +436,55 @@ function isWatchPage(url) {
         return;
     }
 
-    if (!window.globalOptions.setMaxBitrate) {
-        debugLog('[Netflix Optimizer] Max bitrate forcing disabled in settings');
-        return;
-    }
-
-    debugLog('[Netflix Optimizer] Max bitrate forcing enabled');
-
     if (!document.body) {
         debugLog('[Netflix Optimizer] Waiting for document body...');
         setTimeout(init, 100);
         return;
     }
 
+    // Live-refresh settings when popup/options saves new values
+    document.documentElement.addEventListener('nfopt-settings-changed', () => {
+        refreshSettings();
+        debugLog('[Netflix Optimizer] Settings refreshed:', window.globalOptions);
+    });
+
     let currentUrl = window.location.toString();
     let isProcessing = false;
+
+    function startOptimization() {
+        if (isProcessing) return;
+
+        // Re-read settings at trigger time; the enabled/disabled state is
+        // gated here so toggling it no longer requires a page reload.
+        refreshSettings();
+        if (!window.globalOptions || !window.globalOptions.setMaxBitrate) {
+            debugLog('[Netflix Optimizer] Max bitrate forcing disabled in settings');
+            return;
+        }
+
+        isProcessing = true;
+        debugLog('[Netflix Optimizer] Watch page detected, waiting for playback...');
+
+        waitForPlayback(() => {
+            try {
+                maxbitrate_start();
+            } catch (e) {
+                debugError('[Netflix Optimizer] maxbitrate_start failed:', e);
+            } finally {
+                isProcessing = false;
+            }
+        });
+    }
 
     // Use MutationObserver for efficient URL change detection
     const observer = new MutationObserver(() => {
         const newUrl = window.location.toString();
-        
-        if (newUrl !== currentUrl && !isProcessing) {
+
+        if (newUrl !== currentUrl) {
             currentUrl = newUrl;
-            
+
             if (isWatchPage(newUrl)) {
-                isProcessing = true;
-                debugLog('[Netflix Optimizer] Watch page detected, starting optimization...');
-                
-                // Delay to allow player to fully initialize
-                setTimeout(() => {
-                    maxbitrate_start();
-                    isProcessing = false;
-                }, 2000);
+                startOptimization();
             }
         }
     });
@@ -395,9 +497,7 @@ function isWatchPage(url) {
 
     // Initial check in case we're already on a watch page
     if (isWatchPage(currentUrl)) {
-        setTimeout(() => {
-            maxbitrate_start();
-        }, 2000);
+        startOptimization();
     }
 
     debugLog('[Netflix Optimizer] Initialized with MutationObserver');

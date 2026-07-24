@@ -4,6 +4,8 @@ const disableVP9Checkbox = document.getElementById("disable-vp9");
 const disableAVChighCheckbox = document.getElementById("disable-avchigh");
 const disableAV1Checkbox = document.getElementById("disable-av1");
 const showAllSubsCheckbox = document.getElementById("show-all-subs");
+const useHEVCCheckbox = document.getElementById("use-hevc");
+const useDDPlusCheckbox = document.getElementById("use-ddplus");
 
 const optionsSavedLabel = document.getElementById("options-saved");
 
@@ -22,6 +24,8 @@ function saveOptions() {
 		disableAVChigh,
 		showAllSubs,
 		disableAV1,
+		useHEVC: useHEVCCheckbox.checked,
+		useDDPlus: useDDPlusCheckbox.checked,
 	}, function() {
 		optionsSavedLabel.style.display = "inline-block";
 	});
@@ -35,6 +39,8 @@ function restoreOptions() {
 		disableAVChigh: false,
 		showAllSubs: false,
 		disableAV1: false,
+		useHEVC: false,
+		useDDPlus: false,
 	}, function(items) {
 		use6ChannelsCheckbox.checked = items.use6Channels;
 		setMaxBitrateCheckbox.checked = items.setMaxBitrate;
@@ -42,6 +48,8 @@ function restoreOptions() {
 		disableAVChighCheckbox.checked = items.disableAVChigh;
 		showAllSubsCheckbox.checked = items.showAllSubs;
 		disableAV1Checkbox.checked = items.disableAV1;
+		useHEVCCheckbox.checked = items.useHEVC;
+		useDDPlusCheckbox.checked = items.useDDPlus;
 	});
 }
 

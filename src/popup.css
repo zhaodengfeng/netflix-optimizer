@@ -184,6 +184,13 @@ input[type="checkbox"]:focus + .checkbox-custom {
   display: block;
 }
 
+.setting-hint {
+  font-size: 10px;
+  color: #666;
+  margin-top: 6px;
+  line-height: 1.4;
+}
+
 #save-btn {
   background: #e50914;
   border: none;

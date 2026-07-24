@@ -38,6 +38,10 @@ Right-click the extension icon → **Options** to configure:
 - ☐ Disable AVChigh codec
 - ☐ Disable AV1 codec
 - ☐ Show all subtitle tracks
+- ☐ HEVC / 4K HDR (experimental, Windows 11 + Edge)
+- ☐ Dolby Digital Plus / Atmos (experimental, Windows 11 + Edge)
+
+> "Automatically select best bitrate" applies instantly. Codec / 5.1 / subtitle / experimental changes apply after reloading the Netflix tab.
 
 ## Keyboard Shortcuts (on Netflix watch page)
 
@@ -52,6 +56,6 @@ Run `./scripts/package.sh` to create a clean release zip from the `src` folder.
 
 ## How It Works
 
-1. **Player core redirect** — uses `declarativeNetRequest` to redirect Netflix's `cadmium-playercore` script to a patched version that unlocks higher quality profiles
-2. **Bitrate forcing** — injects a script that simulates the hidden `Ctrl+Alt+Shift+B` menu interaction to select the maximum bitrate automatically
+1. **Runtime player patching** — `declarativeNetRequest` redirects Netflix's `cadmium-playercore` script request to a tiny bundled shim (`playercore-shim.js`). The shim fetches the *original* playercore from Netflix's CDN, applies structural regex patches at runtime (quality/audio profiles, subtitle tracks), and executes the patched source. No Netflix code is bundled with the extension, most playercore version bumps are absorbed automatically, and any failure degrades to the unpatched player instead of breaking playback
+2. **Bitrate forcing** — injects a script that waits for actual playback start (via the player API), then simulates the hidden `Ctrl+Alt+Shift+B` menu interaction to select the maximum bitrate automatically
 3. **Platform detection** — detects browser/OS combination to report actual achievable quality

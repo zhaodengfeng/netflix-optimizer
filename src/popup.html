@@ -10,7 +10,7 @@
   <div class="container">
     <div class="header">
       <h1>Netflix Optimizer</h1>
-      <span class="version" id="version">v26.6.20</span>
+      <span class="version" id="version">v26.7.23</span>
     </div>
 
     <div class="status-card" id="statusCard">
@@ -70,6 +70,18 @@
       </label>
 
       <label class="setting-row">
+        <input type="checkbox" id="use-hevc-popup">
+        <span class="checkbox-custom"></span>
+        <span class="setting-label">HEVC / 4K HDR (experimental)</span>
+      </label>
+
+      <label class="setting-row">
+        <input type="checkbox" id="use-ddplus-popup">
+        <span class="checkbox-custom"></span>
+        <span class="setting-label">DD+ / Atmos (experimental)</span>
+      </label>
+
+      <label class="setting-row">
         <input type="checkbox" id="show-all-subs-popup">
         <span class="checkbox-custom"></span>
         <span class="setting-label">All Subtitles</span>
@@ -79,6 +91,7 @@
         <span id="save-msg" class="save-msg">✓ Saved</span>
         <button id="save-btn">Save</button>
       </div>
+      <div class="setting-hint">Auto Best Bitrate applies instantly. Codec / 5.1 / subtitle changes apply after reloading the Netflix tab.</div>
     </div>
 
     <div class="shortcuts">

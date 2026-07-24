@@ -32,7 +32,7 @@ cp "$SRC_DIR/popup.html" "$STAGING/"
 cp "$SRC_DIR/popup.js" "$STAGING/"
 cp "$SRC_DIR/redirect_rules.json" "$STAGING/"
 cp "$SRC_DIR/style_fix.css" "$STAGING/"
-cp "$SRC_DIR/cadmium-playercore-6.0052.717.911-patched.js" "$STAGING/"
+cp "$SRC_DIR/playercore-shim.js" "$STAGING/"
 cp "$SRC_DIR/img/icon16.png" "$SRC_DIR/img/icon32.png" "$SRC_DIR/img/icon48.png" "$SRC_DIR/img/icon128.png" "$STAGING/img/"
 cp "$SRC_DIR/pages/options.html" "$SRC_DIR/pages/options.js" "$STAGING/pages/"
 
