@@ -348,7 +348,7 @@ function loadSettings() {
 }
 
 /**
- * Re-read the settings element so values saved in popup/options apply
+ * Re-read the settings element so values saved in the popup apply
  * without a page reload (content_loader updates the element and pings us).
  * The DOM element always wins over window.globalOptions, which the patched
  * playercore may have pre-filled with defaults.
@@ -442,7 +442,7 @@ function isWatchPage(url) {
         return;
     }
 
-    // Live-refresh settings when popup/options saves new values
+    // Live-refresh settings when the popup toggle saves new values
     document.documentElement.addEventListener('nfopt-settings-changed', () => {
         refreshSettings();
         debugLog('[Netflix Optimizer] Settings refreshed:', window.globalOptions);

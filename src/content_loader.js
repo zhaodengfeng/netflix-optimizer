@@ -1,6 +1,6 @@
-// content_loader.js - Netflix Optimizer v5.1.1
-// Loads settings and injects the max bitrate forcing script
-// Based on New Netflix 1080p (1.33.0_0) implementation
+// content_loader.js - Netflix Optimizer
+// Loads the single enabled switch, derives the per-feature flags from it,
+// and injects them into the page for netflix_maxrate.js / playercore-shim.js.
 
 const INTERNAL_SCRIPTS = [
     'netflix_maxrate.js'
@@ -8,15 +8,13 @@ const INTERNAL_SCRIPTS = [
 const SETTINGS_ELEMENT_ID = 'netflix-optimizer-settings';
 const SETTINGS_CHANGED_EVENT = 'nfopt-settings-changed';
 const DEFAULT_SETTINGS = {
-    use6Channels: true,
-    setMaxBitrate: true,
-    disableVP9: false,
-    disableAVChigh: false,
-    disableAV1: false,
-    showAllSubs: false,
-    useHEVC: false,
-    useDDPlus: false,
+    enabled: true,
 };
+// Storage keys used by pre-single-toggle versions; removed on load.
+const LEGACY_SETTINGS_KEYS = [
+    'use6Channels', 'setMaxBitrate', 'disableVP9', 'disableAVChigh',
+    'disableAV1', 'showAllSubs', 'useHEVC', 'useDDPlus'
+];
 const DEBUG = false;
 
 function debugLog(...args) {
@@ -42,6 +40,68 @@ function chromeStorageGet(opts) {
             reject(e);
         }
     });
+}
+
+/**
+ * HEVC/4K HDR and Dolby Digital Plus/Atmos only work on Windows 11 + Edge
+ * (PlayReady SL3000). Detected via User-Agent Client Hints; any failure
+ * resolves to false so the experimental profiles are never advertised where
+ * they could break playback. Resolved once: the platform cannot change
+ * during a page's lifetime.
+ */
+const experimentalSupportPromise = (function detectExperimentalSupport() {
+    try {
+        const uaData = navigator.userAgentData;
+        if (!uaData || !uaData.brands || !uaData.getHighEntropyValues) {
+            return Promise.resolve(false);
+        }
+        const isEdge = uaData.brands.some(b => b.brand === 'Microsoft Edge');
+        if (!isEdge) {
+            return Promise.resolve(false);
+        }
+        return uaData.getHighEntropyValues(['platform', 'platformVersion'])
+            .then(info => {
+                // Windows 11 reports platformVersion 13.0+; Windows 10 caps at 10.x.
+                const major = parseInt(String(info.platformVersion || '0').split('.')[0], 10);
+                return info.platform === 'Windows' && major >= 13;
+            })
+            .catch(() => false);
+    } catch (e) {
+        return Promise.resolve(false);
+    }
+})();
+
+/**
+ * Map the single enabled switch to the per-feature flags consumed by
+ * netflix_maxrate.js and playercore-shim.js. Off means "touch nothing":
+ * no codecs disabled, no extra profiles advertised, no bitrate forcing.
+ */
+function buildEffectiveSettings(enabled, experimentalSupported) {
+    return {
+        use6Channels: enabled,
+        setMaxBitrate: enabled,
+        disableVP9: false,
+        disableAVChigh: false,
+        disableAV1: false,
+        showAllSubs: enabled,
+        useHEVC: enabled && experimentalSupported,
+        useDDPlus: enabled && experimentalSupported
+    };
+}
+
+/**
+ * Read the enabled switch and resolve it to effective page settings.
+ * Also drops legacy per-feature keys left over from older versions.
+ */
+function loadEffectiveSettings() {
+    return chromeStorageGet({ ...DEFAULT_SETTINGS })
+        .then(items => {
+            try {
+                chrome.storage.sync.remove(LEGACY_SETTINGS_KEYS);
+            } catch (e) { /* stale keys are harmless */ }
+            return experimentalSupportPromise.then(supported =>
+                buildEffectiveSettings(!!items.enabled, supported));
+        });
 }
 
 function addSettingsToHtml(settings) {
@@ -83,30 +143,32 @@ function injectInternalScripts() {
 }
 
 function loadSettingsAndInject() {
-    return chromeStorageGet({ ...DEFAULT_SETTINGS })
-        .then(items => {
-            addSettingsToHtml(items);
-        })
+    return loadEffectiveSettings()
         .catch(error => {
             // Fall back to defaults so a storage failure degrades the
             // extension to default behavior instead of silently doing nothing.
             console.error("[Netflix Optimizer] Failed to load settings, using defaults:", error);
-            addSettingsToHtml({ ...DEFAULT_SETTINGS });
+            return experimentalSupportPromise.then(supported =>
+                buildEffectiveSettings(DEFAULT_SETTINGS.enabled, supported));
+        })
+        .then(effective => {
+            addSettingsToHtml(effective);
         })
         .then(() => {
             injectInternalScripts();
         });
 }
 
-// Re-read settings whenever popup/options saves, and push them into the page.
+// Re-derive settings whenever the popup toggles the switch, and push them
+// into the page.
 function watchSettingsChanges() {
     chrome.storage.onChanged.addListener((changes, area) => {
         if (area !== 'sync') return;
         if (!Object.keys(changes).some(key => key in DEFAULT_SETTINGS)) return;
 
-        chromeStorageGet({ ...DEFAULT_SETTINGS })
-            .then(items => {
-                updateSettingsInHtml(items);
+        loadEffectiveSettings()
+            .then(effective => {
+                updateSettingsInHtml(effective);
             })
             .catch(error => {
                 console.error("[Netflix Optimizer] Failed to refresh settings:", error);

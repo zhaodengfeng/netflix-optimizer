@@ -1,61 +1,26 @@
 // popup.js - Netflix Optimizer Popup Script
 
-// Settings element refs
-const checkboxes = {
-  use51: document.getElementById('use-51-popup'),
-  maxBitrate: document.getElementById('set-max-bitrate-popup'),
-  disableVP9: document.getElementById('disable-vp9-popup'),
-  disableAVChigh: document.getElementById('disable-avchigh-popup'),
-  disableAV1: document.getElementById('disable-av1-popup'),
-  showAllSubs: document.getElementById('show-all-subs-popup'),
-  useHEVC: document.getElementById('use-hevc-popup'),
-  useDDPlus: document.getElementById('use-ddplus-popup'),
-};
+// Single on/off switch. content_loader.js derives all feature flags from it.
+const enabledCheckbox = document.getElementById('enabled-popup');
 
-const saveBtn = document.getElementById('save-btn');
-const saveMsg = document.getElementById('save-msg');
-
-// Restore settings into popup checkboxes
+// Restore the switch position
 function restoreSettings() {
   chrome.storage.sync.get({
-    use6Channels: true,
-    setMaxBitrate: true,
-    disableVP9: false,
-    disableAVChigh: false,
-    disableAV1: false,
-    showAllSubs: false,
-    useHEVC: false,
-    useDDPlus: false,
+    enabled: true,
   }, function(items) {
-    checkboxes.use51.checked = items.use6Channels;
-    checkboxes.maxBitrate.checked = items.setMaxBitrate;
-    checkboxes.disableVP9.checked = items.disableVP9;
-    checkboxes.disableAVChigh.checked = items.disableAVChigh;
-    checkboxes.disableAV1.checked = items.disableAV1;
-    checkboxes.showAllSubs.checked = items.showAllSubs;
-    checkboxes.useHEVC.checked = items.useHEVC;
-    checkboxes.useDDPlus.checked = items.useDDPlus;
+    enabledCheckbox.checked = items.enabled;
   });
 }
 
-// Save settings from popup checkboxes
+// Save immediately on toggle; content_loader picks the change up via
+// chrome.storage.onChanged and re-derives the injected page settings.
 function saveSettings() {
   chrome.storage.sync.set({
-    use6Channels: checkboxes.use51.checked,
-    setMaxBitrate: checkboxes.maxBitrate.checked,
-    disableVP9: checkboxes.disableVP9.checked,
-    disableAVChigh: checkboxes.disableAVChigh.checked,
-    disableAV1: checkboxes.disableAV1.checked,
-    showAllSubs: checkboxes.showAllSubs.checked,
-    useHEVC: checkboxes.useHEVC.checked,
-    useDDPlus: checkboxes.useDDPlus.checked,
-  }, function() {
-    saveMsg.classList.add('visible');
-    setTimeout(() => saveMsg.classList.remove('visible'), 2000);
+    enabled: enabledCheckbox.checked,
   });
 }
 
-saveBtn.addEventListener('click', saveSettings);
+enabledCheckbox.addEventListener('change', saveSettings);
 
 // Get platform info and update status UI
 document.addEventListener('DOMContentLoaded', function() {
@@ -75,7 +40,7 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 function updateUI(info) {
-  document.getElementById('version').textContent = 'v' + (info.version || '26.7.23');
+  document.getElementById('version').textContent = 'v' + (info.version || '26.7.26');
 
   const statusIcon = document.getElementById('statusIcon');
   const statusTitle = document.getElementById('statusTitle');

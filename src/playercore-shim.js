@@ -143,25 +143,56 @@
     };
 
     // Named regex patches. Needles are structural (single-char variable
-    // wildcards) so they survive playercore rebuilds that rename locals.
+    // wildcards) and whitespace-tolerant so they survive playercore rebuilds
+    // that rename locals or change spacing.
     var PATCHES = [
         {
             name: 'standard manifest profiles',
             // e.g. "viewableId:C,profiles:G," -> "viewableId:C,profiles:window.__nfoptProfiles(),"
-            needle: /(viewableId:.,profiles:).,/,
+            needle: /(viewableId\s*:\s*.\s*,\s*profiles\s*:\s*).,/,
             replacement: '$1window.__nfoptProfiles(),'
         },
         {
             name: 'default profile group',
             // e.g. 'name:"default",profiles:G}' -> 'name:"default",profiles:window.__nfoptProfiles()}'
-            needle: /(name:"default",profiles:).\}/,
-            replacement: '$1window.__nfoptProfiles()}'
+            needle: /(name\s*:\s*"default"\s*,\s*profiles\s*:\s*)[A-Za-z_$][\w$]*(\s*\})/,
+            replacement: '$1window.__nfoptProfiles()$2'
         },
         {
             name: 'show all sub/dub tracks',
             // e.g. "!!A.showAllSubDubTracks" -> "!!A.showAllSubDubTracks||window.__nfoptShowAllSubs()"
             needle: /(!!.\.showAllSubDubTracks)(?!\s*\|\|)/,
             replacement: '$1||window.__nfoptShowAllSubs()'
+        },
+        {
+            name: 'diagnostics menu (config default)',
+            // e.g. 'Hja:F(L,H("renderDomDiagnostics"),!1)' -> default !0.
+            // The hidden bitrate/CDN menu (Ctrl+Shift+Alt+B) is only built
+            // when the renderDomDiagnostics config flag is on; the bundled
+            // patched playercore used to force it on. Restore that, because
+            // the auto max-bitrate feature drives this menu — without it both
+            // the shortcut and the automation silently die.
+            needle: /([A-Za-z_$][\w$]*\(\s*"renderDomDiagnostics"\s*\)\s*,\s*)![01]/,
+            replacement: '$1!0'
+        },
+        {
+            name: 'diagnostics menu (config getter)',
+            // e.g. t.__decorate([c.config(c.Bd,"renderDomDiagnostics")],g.prototype,"Hja",null)
+            // -> append the same always-true getter override the bundled
+            // patched playercore shipped.
+            needle: /(?:[A-Za-z_$][\w$]*\.)?__decorate\(\s*\[[A-Za-z_$][\w$]*\.config\([A-Za-z_$][\w$]*\.[A-Za-z_$][\w$]*\s*,\s*"renderDomDiagnostics"\s*\)\s*\]\s*,\s*([A-Za-z_$][\w$]*)\.prototype\s*,\s*"([A-Za-z_$][\w$]*)"\s*,\s*null\s*\)/,
+            replacement: '$&;Object.defineProperty($1.prototype,"$2",{configurable:!0,enumerable:!0,get:function(){return!0}});'
+        },
+        {
+            name: 'bitrate menu for all accounts',
+            // e.g. "keyCode == g.IZ.Lma && this.Jfa.Z2a && this.toggle()"
+            // -> "keyCode == g.IZ.Lma && this.toggle()".
+            // Newer playercores only toggle the bitrate menu when the
+            // isTestAccount config flag is set (Netflix-internal accounts).
+            // Drop that condition; do NOT force isTestAccount itself, which
+            // would tag the account as a tester in Netflix telemetry.
+            needle: /(keyCode\s*==\s*[A-Za-z_$][\w$]*\.[A-Za-z_$][\w$]*\.[A-Za-z_$][\w$]*)\s*&&\s*this\.[A-Za-z_$][\w$]*\.[A-Za-z_$][\w$]*(\s*&&\s*this\.toggle\(\))/,
+            replacement: '$1$2'
         }
     ];
 

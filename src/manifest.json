@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Netflix Optimizer - 4K/1080p + 5.1",
-  "version": "26.7.23",
+  "version": "26.7.26",
   "description": "Unlock 4K HDR on Windows Edge, 1080p on Mac/Chrome, plus 5.1 audio",
   "permissions": [
     "declarativeNetRequest",
@@ -53,10 +53,6 @@
       ]
     }
   ],
-  "options_ui": {
-    "page": "pages/options.html",
-    "open_in_tab": false
-  },
   "action": {
     "default_popup": "popup.html",
     "default_icon": {

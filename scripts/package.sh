@@ -21,7 +21,7 @@ cleanup() {
 trap cleanup EXIT
 
 mkdir -p "$DIST_DIR"
-mkdir -p "$STAGING/img" "$STAGING/pages"
+mkdir -p "$STAGING/img"
 
 cp "$SRC_DIR/manifest.json" "$STAGING/"
 cp "$SRC_DIR/background.js" "$STAGING/"
@@ -34,7 +34,6 @@ cp "$SRC_DIR/redirect_rules.json" "$STAGING/"
 cp "$SRC_DIR/style_fix.css" "$STAGING/"
 cp "$SRC_DIR/playercore-shim.js" "$STAGING/"
 cp "$SRC_DIR/img/icon16.png" "$SRC_DIR/img/icon32.png" "$SRC_DIR/img/icon48.png" "$SRC_DIR/img/icon128.png" "$STAGING/img/"
-cp "$SRC_DIR/pages/options.html" "$SRC_DIR/pages/options.js" "$STAGING/pages/"
 
 rm -f "$PACKAGE"
 (

@@ -164,45 +164,11 @@ input[type="checkbox"]:focus + .checkbox-custom {
   border-color: #e50914;
 }
 
-.setting-footer {
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  gap: 8px;
-  margin-top: 8px;
-  padding-top: 8px;
-  border-top: 1px solid #333;
-}
-
-.save-msg {
-  color: #46d369;
-  font-size: 11px;
-  display: none;
-}
-
-.save-msg.visible {
-  display: block;
-}
-
 .setting-hint {
   font-size: 10px;
   color: #666;
   margin-top: 6px;
   line-height: 1.4;
-}
-
-#save-btn {
-  background: #e50914;
-  border: none;
-  color: #fff;
-  padding: 5px 14px;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 12px;
-}
-
-#save-btn:hover {
-  background: #f40612;
 }
 
 /* Shortcuts */
@@ -236,12 +202,4 @@ kbd {
 .shortcut span {
   font-size: 10px;
   color: #666;
-}
-
-/* Footer */
-.footer {
-  text-align: center;
-  font-size: 10px;
-  color: #555;
-  margin-top: 4px;
 }

@@ -1,5 +1,5 @@
 // background.js - Netflix Optimizer Service Worker
-const EXTENSION_VERSION = '26.7.23';
+const EXTENSION_VERSION = '26.7.26';
 const DEBUG = false;
 
 function debugLog(...args) {
